@@ -13,7 +13,7 @@
 		"precise-memory-rate-limit": "^1.1.4",
 		"rate-limit-memcached": "^0.6.0",
 		"rate-limit-mongo": "^2.3.2",
-		"rate-limit-redis": "^3.0.2",
+		"rate-limit-redis": "https://github.com/mganga0109/rate-limit-redis.git",
 		"redis": "^4.6.7"
 	},
 	"devDependencies": {
