@@ -84,7 +84,7 @@ const promisifyStore = (passedStore: LegacyStore | Store): Store => {
 		}
 
 		async decrementBy(key: string, score: number): Promise<void> {
-			return legacyStore.decrement(key, score)
+			return legacyStore.decrementBy(key, score)
 		}
 
 		async resetKey(key: string): Promise<void> {
