@@ -94,6 +94,16 @@ export default class MemoryStore implements Store {
 		}
 	}
 
+	async incrementBy(key: string, score: number): Promise<IncrementResponse> {
+		const totalHits = (this.hits[key] ?? 0) + score
+		this.hits[key] = totalHits
+
+		return {
+			totalHits,
+			resetTime: this.resetTime,
+		}
+	}
+
 	/**
 	 * Method to decrement a client's hit counter.
 	 *
@@ -105,6 +115,12 @@ export default class MemoryStore implements Store {
 		const current = this.hits[key]
 
 		if (current) this.hits[key] = current - 1
+	}
+
+	async decrementBy(key: string, score: number): Promise<void> {
+		const current = this.hits[key]
+
+		if (current) this.hits[key] = current - score
 	}
 
 	/**

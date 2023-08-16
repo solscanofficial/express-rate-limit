@@ -98,12 +98,16 @@ export type LegacyStore = {
 	 */
 	incr: (key: string, callback: IncrementCallback) => void
 
+	incrBy: (key: string, score: number, callback: IncrementCallback) => void
+
 	/**
 	 * Method to decrement a client's hit counter.
 	 *
 	 * @param key {string} - The identifier for a client.
 	 */
 	decrement: (key: string) => void
+
+	decrementBy: (key: string, score: number) => void
 
 	/**
 	 * Method to reset a client's hit counter.
