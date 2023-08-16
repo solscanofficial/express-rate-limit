@@ -62,8 +62,29 @@ const promisifyStore = (passedStore: LegacyStore | Store): Store => {
 			})
 		}
 
+		async incrementBy(key: string, score: number): Promise<IncrementResponse> {
+			return new Promise((resolve, reject) => {
+				legacyStore.incrBy(
+					key,
+					score,
+					(
+						error: Error | undefined,
+						totalHits: number,
+						resetTime: Date | undefined,
+					) => {
+						if (error) reject(error)
+						resolve({ totalHits, resetTime })
+					},
+				)
+			})
+		}
+
 		async decrement(key: string): Promise<void> {
 			return legacyStore.decrement(key)
+		}
+
+		async decrementBy(key: string, score: number): Promise<void> {
+			return legacyStore.decrement(key, score)
 		}
 
 		async resetKey(key: string): Promise<void> {
