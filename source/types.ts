@@ -139,12 +139,19 @@ export type Store = {
 	 */
 	increment: (key: string) => Promise<IncrementResponse> | IncrementResponse
 
+	incrementBy: (
+		key: string,
+		score: number,
+	) => Promise<IncrementResponse> | IncrementResponse
+
 	/**
 	 * Method to decrement a client's hit counter.
 	 *
 	 * @param key {string} - The identifier for a client.
 	 */
 	decrement: (key: string) => Promise<void> | void
+
+	decrementBy: (key: string, score: number) => Promise<void> | void
 
 	/**
 	 * Method to reset a client's hit counter.
