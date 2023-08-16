@@ -199,6 +199,7 @@ const parseOptions = (passedOptions: Partial<Options>): Configuration => {
 	// defaults.
 	const config: Configuration = {
 		windowMs: 60 * 1000,
+		expireAtMs: 9_999_999_999_999,
 		max: 5,
 		message: 'Too many requests, please try again later.',
 		statusCode: 429,
