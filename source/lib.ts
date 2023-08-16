@@ -113,6 +113,7 @@ const promisifyStore = (passedStore: LegacyStore | Store): Store => {
  */
 type Configuration = {
 	windowMs: number
+	expireAtMs: number | ValueDeterminingMiddleware<number>
 	max: number | ValueDeterminingMiddleware<number>
 	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 	message: any | ValueDeterminingMiddleware<any>
@@ -321,6 +322,14 @@ const rateLimit = (
 				next()
 				return
 			}
+
+			const expireAtMsData =
+				typeof config.expireAtMs === 'function'
+					? config.expireAtMs(request, response)
+					: config.expireAtMs
+			const expireAtMsResult = await expireAtMsData
+			if (typeof config.store.setExpireAt === 'function')
+				config.store.setExpireAt(expireAtMsResult)
 
 			// Create an augmented request
 			const augmentedRequest = request as AugmentedRequest

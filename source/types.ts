@@ -157,6 +157,8 @@ export type Store = {
 
 	decrementBy: (key: string, score: number) => Promise<void> | void
 
+	setExpireAt?: (expireAtMs: number) => void
+
 	/**
 	 * Method to reset a client's hit counter.
 	 *
@@ -205,6 +207,8 @@ export type Options = {
 	 * Defaults to `5`.
 	 */
 	max: number | ValueDeterminingMiddleware<number>
+
+	expireAtMs: number | ValueDeterminingMiddleware<number>
 
 	/**
 	 * The response body to send back when a client is rate limited.
