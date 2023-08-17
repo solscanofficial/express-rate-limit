@@ -114,9 +114,6 @@ const promisifyStore = (passedStore: LegacyStore | Store): Store => {
 type Configuration = {
 	windowMs: number
 	expireAtMs: number | ValueDeterminingMiddleware<number>
-	cu:
-		| { [key: string]: unknown }
-		| ValueDeterminingMiddleware<{ [key: string]: unknown }>
 	max: number | ValueDeterminingMiddleware<number>
 	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 	message: any | ValueDeterminingMiddleware<any>
@@ -130,6 +127,7 @@ type Configuration = {
 	handler: RateLimitExceededEventHandler
 	onLimitReached: RateLimitReachedEventHandler
 	skip: ValueDeterminingMiddleware<boolean>
+	score: number | ValueDeterminingMiddleware<number>
 	requestWasSuccessful: ValueDeterminingMiddleware<boolean>
 	store: Store
 	validations: Validations
@@ -204,6 +202,7 @@ const parseOptions = (passedOptions: Partial<Options>): Configuration => {
 		windowMs: 60 * 1000,
 		expireAtMs: 9_999_999_999_999,
 		max: 5,
+		score: 1,
 		message: 'Too many requests, please try again later.',
 		statusCode: 429,
 		legacyHeaders: passedOptions.headers ?? true,
@@ -337,11 +336,11 @@ const rateLimit = (
 				config.store.setExpireAt(expireAtMsResult)
 
 			// Get computer unit
-			const cuDataFn =
-				typeof config.cu === 'function'
-					? config.cu(request, response)
-					: config.cu
-			const cuData = await cuDataFn
+			const scoreDataFn =
+				typeof config.score === 'function'
+					? config.score(request, response)
+					: config.score
+			const scoreData = await scoreDataFn
 
 			// Create an augmented request
 			const augmentedRequest = request as AugmentedRequest
@@ -349,7 +348,10 @@ const rateLimit = (
 			// Get a unique key for the client
 			const key = await config.keyGenerator(request, response)
 			// Increment the client's hit counter by one, and make sure it's only by one
-			const { totalHits, resetTime } = await config.store.incrementBy(key, 10)
+			const { totalHits, resetTime } = await config.store.incrementBy(
+				key,
+				scoreData,
+			)
 			config.validations.singleCount(request, config.store, key)
 
 			// Get the quota (max number of hits) for each client
