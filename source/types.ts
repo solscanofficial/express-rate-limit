@@ -208,6 +208,9 @@ export type Options = {
 	 */
 	max: number | ValueDeterminingMiddleware<number>
 
+	score: number | ValueDeterminingMiddleware<number>
+	headerPrefix: string
+
 	expireAtMs: number | ValueDeterminingMiddleware<number>
 
 	/**
