@@ -122,6 +122,7 @@ type Configuration = {
 	legacyHeaders: boolean
 	standardHeaders: boolean
 	requestPropertyName: string
+	headerPrefix: string
 	skipFailedRequests: boolean
 	skipSuccessfulRequests: boolean
 	keyGenerator: ValueDeterminingMiddleware<string>
@@ -204,6 +205,7 @@ const parseOptions = (passedOptions: Partial<Options>): Configuration => {
 		expireAtMs: 9_999_999_999_999,
 		max: 5,
 		score: 1,
+		headerPrefix: 'RateLimit',
 		message: 'Too many requests, please try again later.',
 		statusCode: 429,
 		legacyHeaders: passedOptions.headers ?? true,
@@ -396,9 +398,13 @@ const rateLimit = (
 			// Set the standardized RateLimit headers on the response object
 			// if enabled.
 			if (config.standardHeaders && !response.headersSent) {
-				response.setHeader('RateLimit-Limit', maxHits)
+				if (!lodash.isString(config.headerPrefix)) {
+					config.headerPrefix = 'RateLimit'
+				}
+
+				response.setHeader(`${config.headerPrefix}-Limit`, maxHits)
 				response.setHeader(
-					'RateLimit-Remaining',
+					`${config.headerPrefix}-Remaining`,
 					augmentedRequest[config.requestPropertyName].remaining,
 				)
 
@@ -406,7 +412,10 @@ const rateLimit = (
 					const deltaSeconds = Math.ceil(
 						(resetTime.getTime() - Date.now()) / 1000,
 					)
-					response.setHeader('RateLimit-Reset', Math.max(0, deltaSeconds))
+					response.setHeader(
+						`${config.headerPrefix}-Reset`,
+						Math.max(0, deltaSeconds),
+					)
 				}
 			}
 
