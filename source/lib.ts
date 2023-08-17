@@ -2,6 +2,7 @@
 // The option parser and rate limiting middleware
 
 import type { Request, Response, NextFunction, RequestHandler } from 'express'
+import lodash from 'lodash'
 import type {
 	Options,
 	AugmentedRequest,
@@ -340,7 +341,10 @@ const rateLimit = (
 				typeof config.score === 'function'
 					? config.score(request, response)
 					: config.score
-			const scoreData = await scoreDataFn
+			let scoreData = await scoreDataFn
+			if (!lodash.isNumber(scoreData)) {
+				scoreData = 1
+			}
 
 			// Create an augmented request
 			const augmentedRequest = request as AugmentedRequest
