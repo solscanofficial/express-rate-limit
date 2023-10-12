@@ -423,9 +423,9 @@ const rateLimit = (
 			// counter accordingly once we know the status code of the request
 			if (config.skipFailedRequests || config.skipSuccessfulRequests) {
 				let decremented = false
-				const decrementKey = async () => {
+				const decrementKey = async (score: number) => {
 					if (!decremented) {
-						await config.store.decrement(key)
+						await config.store.decrementBy(key, score)
 						decremented = true
 					}
 				}
@@ -433,20 +433,20 @@ const rateLimit = (
 				if (config.skipFailedRequests) {
 					response.on('finish', async () => {
 						if (!config.requestWasSuccessful(request, response))
-							await decrementKey()
+							await decrementKey(scoreData)
 					})
 					response.on('close', async () => {
-						if (!response.writableEnded) await decrementKey()
+						if (!response.writableEnded) await decrementKey(scoreData)
 					})
 					response.on('error', async () => {
-						await decrementKey()
+						await decrementKey(scoreData)
 					})
 				}
 
 				if (config.skipSuccessfulRequests) {
 					response.on('finish', async () => {
 						if (config.requestWasSuccessful(request, response))
-							await decrementKey()
+							await decrementKey(scoreData)
 					})
 				}
 			}
